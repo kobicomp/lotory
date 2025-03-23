@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מחולל הגרלות פרימיום</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Rubik', 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(13, 17, 23, 0.85);
+      border-radius: 20px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+      padding: 30px;
+      position: relative;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .container:before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 3px);
+      background-size: 30px 30px;
+      transform: rotate(30deg);
+      z-index: 0;
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    h1 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 42px;
+      position: relative;
+      text-shadow: 0 0 10px rgba(79, 195, 247, 0.8);
+      z-index: 1;
+    }
+
+    h1 span {
+      background: linear-gradient(45deg, #4FC3F7, #E040FB);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 180px;
+      height: 5px;
+      background: linear-gradient(to right, #4FC3F7, #E040FB);
+      margin: 15px auto 0;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(79, 195, 247, 0.7);
+    }
+
+    .main-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .lottery-box {
+      position: relative;
+      min-height: 400px;
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.5s;
+    }
+
+    .lottery-box:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, rgba(79, 195, 247, 0.1) 0%, rgba(224, 64, 251, 0.05) 100%);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hexagon-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hexagon-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .hexagon-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    .hexagon-container::-webkit-scrollbar-thumb {
+      background: rgba(79, 195, 247, 0.2);
+      border-radius: 4px;
+    }
+
+    .hexagon-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(79, 195, 247, 0.3);
+    }
+
+    .hexagon {
+      width: 100px;
+      height: 115px;
+      position: relative;
+      margin: 5px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      background: rgba(255, 255, 255, 0.08);
+      transition: all 0.5s;
+      cursor: default;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .hexagon:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hexagon-index {
+      position: absolute;
+      top: 5px;
+      left: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .hexagon-content {
+      text-align: center;
+      font-size: 14px;
+      word-break: break-word;
+      max-height: 80%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+    }
+
+    .hexagon.highlight {
+      animation: highlightPulse 0.3s infinite;
+      background: rgba(255, 193, 7, 0.2);
+      z-index: 10;
+    }
+
+    @keyframes highlightPulse {
+      0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+      50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    }
+
+    .hexagon.winner {
+      background: linear-gradient(135deg, #FFC107, #FF5722);
+      transform: scale(1.08) translateY(-5px);
+      z-index: 20;
+      box-shadow: 0 15px 30px rgba(255, 87, 34, 0.4);
+      animation: winnerPulse 3s infinite;
+    }
+
+    @keyframes winnerPulse {
+      0% { box-shadow: 0 15px 30px rgba(255, 87, 34, 0.4); }
+      50% { box-shadow: 0 15px 40px rgba(255, 193, 7, 0.7); }
+      100% { box-shadow: 0 15px 30px rgba(255, 87, 34, 0.4); }
+    }
+
+    .hexagon.winner:before {
+      content: '🏆';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 24px;
+      z-index: 30;
+      filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    }
+
+    .btn-draw {
+      background: linear-gradient(45deg, #FF6D00, #FFAB00);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 22px;
+      border-radius: 15px;
+      margin: 20px auto;
+      position: relative;
+      overflow: hidden;
+      padding: 20px 40px;
+      max-width: 300px;
+      cursor: pointer;
+      border: none;
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(255, 109, 0, 0.3);
+      transition: all 0.3s;
+    }
+
+    .btn-draw:hover {
+      background: linear-gradient(45deg, #FF5722, #FFC107);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(255, 109, 0, 0.4);
+    }
+
+    .btn-draw:active {
+      transform: translateY(1px);
+      box-shadow: 0 5px 15px rgba(255, 109, 0, 0.4);
+    }
+
+    .btn-draw:disabled {
+      background: linear-gradient(45deg, #9E9E9E, #BDBDBD);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      opacity: 0.7;
+    }
+
+    .btn-icon {
+      font-size: 28px;
+      z-index: 2;
+    }
+
+    .btn-text {
+      z-index: 2;
+    }
+
+    .btn-settings {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 100;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-settings:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(30deg);
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      left: -400px;
+      width: 400px;
+      height: 100%;
+      background: rgba(13, 17, 23, 0.95);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      transition: all 0.5s;
+      padding: 30px;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .settings-panel.open {
+      left: 0;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 15px;
+    }
+
+    .settings-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .btn-close-settings {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-close-settings:hover {
+      transform: scale(1.2);
+      color: #FF5722;
+    }
+
+    .settings-section {
+      margin-bottom: 25px;
+    }
+
+    .settings-section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #4FC3F7;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    input, button, textarea, select {
+      font-size: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 100%;
+      transition: all 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #4FC3F7;
+      box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input label {
+      display: inline-block;
+      padding: 12px;
+      background: linear-gradient(45deg, #4FC3F7, #00B0FF);
+      color: white;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      margin-bottom: 0;
+    }
+
+    .file-input:hover label {
+      background: linear-gradient(45deg, #00B0FF, #0091EA);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 176, 255, 0.4);
+    }
+
+    .file-name {
+      margin-top: 8px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .settings-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .btn-settings-action {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    .btn-reset {
+      background: linear-gradient(45deg, #78909C, #607D8B);
+    }
+
+    .btn-reset:hover {
+      background: linear-gradient(45deg, #607D8B, #455A64);
+    }
+
+    .btn-new-draw {
+      background: linear-gradient(45deg, #9C27B0, #673AB7);
+    }
+
+    .btn-new-draw:hover {
+      background: linear-gradient(45deg, #8E24AA, #5E35B1);
+    }
+
+    .winners-section {
+      margin-top: 30px;
+    }
+
+    .winners-header {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #FFC107, #FF5722);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      margin-right: auto;
+      margin-left: auto;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .winners-header:after {
+      content: '';
+      display: block;
+      width: 60%;
+      height: 3px;
+      background: linear-gradient(to right, #FFC107, #FF5722);
+      margin: 8px auto 0;
+      border-radius: 3px;
+    }
+
+    .winners-list {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .winners-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .winners-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    .winners-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 193, 7, 0.3);
+      border-radius: 4px;
+    }
+
+    .winners-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 193, 7, 0.5);
+    }
+
+    .winner-item {
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border-left: 4px solid #FFC107;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .winner-item:hover {
+      transform: translateX(-5px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .winner-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .winner-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #FFC107, #FF5722);
+      color: #000;
+      border-radius: 50%;
+      text-align: center;
+      margin-left: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(255, 87, 34, 0.3);
+    }
+
+    .winner-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .winner-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .winner-prize {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 5px;
+    }
+
+    .stats-section {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px;
+      margin: 25px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-section:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(79, 195, 247, 0.05), rgba(224, 64, 251, 0.05));
+      z-index: -1;
+    }
+
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      padding: 0 15px;
+      position: relative;
+    }
+
+    .stat-item:not(:last-child):after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(45deg, #4FC3F7, #00B0FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .lottery-stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s;
+      overflow: hidden;
+    }
+
+    .lottery-stage.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .stage-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 0 0 20px rgba(79, 195, 247, 0.8);
+      animation: stageTitlePulse 2s infinite;
+    }
+
+    @keyframes stageTitlePulse {
+      0% { text-shadow: 0 0 20px rgba(79, 195, 247, 0.8); }
+      50% { text-shadow: 0 0 40px rgba(224, 64, 251, 0.8); }
+      100% { text-shadow: 0 0 20px rgba(79, 195, 247, 0.8); }
+    }
+
+    .stage-cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      max-width: 90%;
+      max-height: 60vh;
+      overflow-y: auto;
+      perspective: 1000px;
+    }
+
+    .stage-cards-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .stage-cards-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    .stage-cards-container::-webkit-scrollbar-thumb {
+      background: rgba(79, 195, 247, 0.2);
+      border-radius: 4px;
+    }
+
+    .stage-card {
+      width: 90px;
+      height: 104px;
+      position: relative;
+      margin: 5px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      background: rgba(255, 255, 255, 0.08);
+      transition: all 0.5s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      transform-style: preserve-3d;
+    }
+
+    .stage-card.highlight {
+      animation: cardHighlight 0.5s;
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1) translateY(-5px);
+      z-index: 10;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .stage-card.selected {
+      background: linear-gradient(135deg, #FFC107, #FF5722);
+      transform: scale(1.2) translateY(-10px);
+      box-shadow: 0 15px 30px rgba(255, 87, 34, 0.4);
+      z-index: 20;
+    }
+
+    .stage-card.fade-out {
+      opacity: 0.2;
+      transform: scale(0.8);
+    }
+
+    @keyframes cardHighlight {
+      0% { transform: scale(1); background: rgba(255, 255, 255, 0.08); }
+      50% { transform: scale(1.2) translateY(-10px); background: rgba(255, 255, 255, 0.3); }
+      100% { transform: scale(1.1) translateY(-5px); background: rgba(255, 255, 255, 0.2); }
+    }
+
+    .stage-card-index {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .stage-card-name {
+      font-size: 14px;
+      text-align: center;
+      word-break: break-word;
+      max-height: 80%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .stage-progress {
+      width: 60%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-top: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #4FC3F7, #E040FB);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .stage-controls {
+      margin-top: 30px;
+    }
+
+    .btn-stage-settings {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+
+    .btn-stage-settings:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(30deg);
+    }
+
+    .btn-close-stage {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .btn-close-stage:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #ffd700;
+      top: 0;
+      opacity: 0;
+      z-index: 1000;
+    }
+
+    .stars-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: twinkle 2s infinite;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+      100% { opacity: 0.2; }
+    }
+
+    .error-message {
+      color: #FF5252;
+      margin-top: 8px;
+      font-size: 14px;
+      text-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
+    }
+
+    .sound-settings {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .sound-toggle {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+
+    .sound-label {
+      margin-right: 10px;
+      margin-bottom: 0;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #4FC3F7;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    .draw-settings-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .draw-settings-col {
+      flex: 1;
+    }
+
+    .no-items-message {
+      text-align: center;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 40px;
+    }
+
+    /* אפשרויות ייצוא */
+    .export-section {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+
+    .export-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .export-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4FC3F7;
+    }
+
+    .export-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .export-btn {
+      background: linear-gradient(45deg, #00BFA5, #00796B);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.3s;
+    }
+
+    .export-btn:hover {
+      background: linear-gradient(45deg, #00897B, #00695C);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 191, 165, 0.3);
+    }
+
+    .copy-btn {
+      background: linear-gradient(45deg, #7B1FA2, #6A1B9A);
+    }
+
+    .copy-btn:hover {
+      background: linear-gradient(45deg, #6A1B9A, #4A148C);
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .toast-message.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* הגדרת שם לסיבוב */
+    .draw-name-input {
+      margin-bottom: 20px;
+    }
+
+    .draw-name-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #00B0FF;
+      font-weight: bold;
+    }
+
+    .current-draw-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4FC3F7;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    /* הגדרות אודיו */
+    .audio-settings-section {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+
+    .audio-select {
+      margin-bottom: 10px;
+    }
+
+    .audio-upload {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.2);
+    }
+
+    .audio-status {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #4FC3F7;
+    }
+
+    .audio-player {
+      width: 100%;
+      height: 30px;
+      margin-top: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    /* רספונסיביות */
+    @media (max-width: 992px) {
+      .settings-panel {
+        width: 320px;
+        left: -320px;
+      }
+
+      .stage-cards-container {
+        max-width: 95%;
+      }
+
+      .stage-progress {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .btn-settings {
+        top: 15px;
+        left: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+
+      .stage-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .stage-card {
+        width: 70px;
+        height: 80px;
+      }
+
+      .hexagon {
+        width: 80px;
+        height: 92px;
+      }
+
+      .export-actions {
+        flex-direction: column;
+      }
+
+      .draw-settings-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars-container" id="stars-container"></div>
+  <div class="toast-message" id="toast-message"></div>
+
+  <div class="container">
+    <h1><span>מחולל הגרלות</span> פרימיום</h1>
+
+    <button class="btn-settings" id="btn-settings">⚙️</button>
+
+    <div class="main-content">
+      <div class="current-draw-name" id="current-draw-name"></div>
+
+      <div class="lottery-box">
+        <div class="hexagon-container" id="hexagon-container">
+          <div class="no-items-message" id="no-items-message">
+            אין פריטים להגרלה, אנא הוסף פריטים בהגדרות
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-section">
+        <div class="stat-item">
+          <div class="stat-value" id="total-items">0</div>
+          <div class="stat-label">סך הכל פריטים</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="available-items">0</div>
+          <div class="stat-label">פריטים זמינים</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="total-winners">0</div>
+          <div class="stat-label">סך הכל זוכים</div>
+        </div>
+      </div>
+
+      <button class="btn-draw" id="btn-draw" disabled>
+        <span class="btn-icon">🎲</span>
+        <span class="btn-text">הגרל עכשיו!</span>
+      </button>
+
+      <div class="winners-section">
+        <h2 class="winners-header">הזוכים בהגרלה</h2>
+        <div class="winners-list" id="winners-list"></div>
+
+        <!-- אפשרויות ייצוא -->
+        <div class="export-section" id="export-section" style="display: none;">
+          <div class="export-header">
+            <div class="export-title">ייצוא תוצאות</div>
+            <div class="export-actions">
+              <button class="export-btn copy-btn" id="btn-copy-results">
+                <span>העתק ללוח</span>
+                <span>📋</span>
+              </button>
+              <button class="export-btn" id="btn-export-csv">
+                <span>ייצוא ל-CSV</span>
+                <span>📄</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-header">
+      <div class="settings-title">הגדרות ההגרלה</div>
+      <button class="btn-close-settings" id="btn-close-settings">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">הוספת פריטים</div>
+      <div class="input-group">
+        <label for="items-input">הזן פריטים (כל שורה פריט נפרד):</label>
+        <textarea id="items-input" placeholder="הזן פריטים כאן, כל פריט בשורה נפרדת"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>או טען רשימה מקובץ:</label>
+        <div class="file-input">
+          <label for="file-upload">בחר קובץ טקסט</label>
+          <input type="file" id="file-upload" accept=".txt,.csv">
+        </div>
+        <div class="file-name" id="file-name"></div>
+      </div>
+
+      <button id="btn-add-items">הוסף פריטים</button>
+      <div class="error-message" id="error-message"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">הגדרות הגרלה</div>
+
+      <!-- שם לסיבוב ההגרלה הנוכחי -->
+      <div class="input-group draw-name-input">
+        <label for="draw-name">שם לסיבוב ההגרלה הנוכחי:</label>
+        <input type="text" id="draw-name" placeholder="לדוגמה: פרס ראשון, חולצות, ארוחת בוקר...">
+      </div>
+
+      <div class="draw-settings-row">
+        <div class="draw-settings-col">
+          <div class="input-group">
+            <label for="winners-count">מספר זוכים להגרלה:</label>
+            <input type="number" id="winners-count" min="1" value="1">
+          </div>
+        </div>
+        <div class="draw-settings-col">
+          <div class="input-group">
+            <label for="allow-duplicates">אפשר כפילויות:</label>
+            <select id="allow-duplicates">
+              <option value="true">כן - אפשר שמות זהים</option>
+              <option value="false">לא - מנע כפילויות</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="sound-settings">
+        <div class="sound-toggle">
+          <label class="sound-label">אפקטי צליל:</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="sound-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="sound-toggle">
+          <label class="sound-label">אנימציות:</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="animation-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- הגדרות אודיו -->
+    <div class="settings-section audio-settings-section">
+      <div class="settings-section-title">הגדרות צלילים</div>
+
+      <!-- צליל תופים -->
+      <div class="input-group">
+        <label for="drumroll-sound">צליל תופים להגרלה:</label>
+        <select id="drumroll-sound" class="audio-select">
+          <option value="default">ברירת מחדל</option>
+          <option value="custom">מותאם אישית</option>
+        </select>
+
+        <div id="custom-drumroll-container" class="audio-upload" style="display: none;">
+          <div class="file-input">
+            <label for="custom-drumroll-file">העלה צליל תופים מותאם אישית</label>
+            <input type="file" id="custom-drumroll-file" accept="audio/*">
+          </div>
+          <div class="audio-status" id="drumroll-status"></div>
+          <audio controls id="drumroll-preview" class="audio-player" style="display: none;"></audio>
+        </div>
+      </div>
+
+      <!-- צליל זכייה -->
+      <div class="input-group">
+        <label for="tada-sound">צליל זכייה:</label>
+        <select id="tada-sound" class="audio-select">
+          <option value="default">ברירת מחדל</option>
+          <option value="custom">מותאם אישית</option>
+        </select>
+
+        <div id="custom-tada-container" class="audio-upload" style="display: none;">
+          <div class="file-input">
+            <label for="custom-tada-file">העלה צליל זכייה מותאם אישית</label>
+            <input type="file" id="custom-tada-file" accept="audio/*">
+          </div>
+          <div class="audio-status" id="tada-status"></div>
+          <audio controls id="tada-preview" class="audio-player" style="display: none;"></audio>
+        </div>
+      </div>
+
+      <!-- צליל טיק -->
+      <div class="input-group">
+        <label for="tick-sound">צליל לחיצה:</label>
+        <select id="tick-sound" class="audio-select">
+          <option value="default">ברירת מחדל</option>
+          <option value="custom">מותאם אישית</option>
+        </select>
+
+        <div id="custom-tick-container" class="audio-upload" style="display: none;">
+          <div class="file-input">
+            <label for="custom-tick-file">העלה צליל לחיצה מותאם אישית</label>
+            <input type="file" id="custom-tick-file" accept="audio/*">
+          </div>
+          <div class="audio-status" id="tick-status"></div>
+          <audio controls id="tick-preview" class="audio-player" style="display: none;"></audio>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn-settings-action btn-reset" id="btn-reset">אפס זוכים</button>
+      <button class="btn-settings-action btn-new-draw" id="btn-new-draw">הגרלה חדשה</button>
+    </div>
+  </div>
+
+  <div class="lottery-stage" id="lottery-stage">
+    <div class="stage-title">ההגרלה מתבצעת...</div>
+    <div class="stage-cards-container" id="stage-cards-container"></div>
+    <div class="stage-progress">
+      <div class="stage-progress-bar" id="stage-progress-bar"></div>
+    </div>
+    <div class="stage-controls">
+      <button class="btn-close-stage" id="btn-close-stage" style="display: none;">חזור למסך הראשי</button>
+    </div>
+    <button class="btn-stage-settings" id="btn-stage-settings">⚙️</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // יצירת כוכבים ברקע
+      createStars();
+
+      // אלמנטים
+      const settingsPanel = document.getElementById('settings-panel');
+      const btnSettings = document.getElementById('btn-settings');
+      const btnCloseSettings = document.getElementById('btn-close-settings');
+      const btnStageSettings = document.getElementById('btn-stage-settings');
+      const itemsInput = document.getElementById('items-input');
+      const fileUpload = document.getElementById('file-upload');
+      const fileName = document.getElementById('file-name');
+      const btnAddItems = document.getElementById('btn-add-items');
+      const hexagonContainer = document.getElementById('hexagon-container');
+      const noItemsMessage = document.getElementById('no-items-message');
+      const winnersCountInput = document.getElementById('winners-count');
+      const allowDuplicatesSelect = document.getElementById('allow-duplicates');
+      const soundToggle = document.getElementById('sound-toggle');
+      const animationToggle = document.getElementById('animation-toggle');
+      const btnDraw = document.getElementById('btn-draw');
+      const btnReset = document.getElementById('btn-reset');
+      const btnNewDraw = document.getElementById('btn-new-draw');
+      const winnersList = document.getElementById('winners-list');
+      const totalItemsEl = document.getElementById('total-items');
+      const availableItemsEl = document.getElementById('available-items');
+      const totalWinnersEl = document.getElementById('total-winners');
+      const errorMessage = document.getElementById('error-message');
+      const lotteryStage = document.getElementById('lottery-stage');
+      const stageCardsContainer = document.getElementById('stage-cards-container');
+      const stageProgressBar = document.getElementById('stage-progress-bar');
+      const btnCloseStage = document.getElementById('btn-close-stage');
+      const exportSection = document.getElementById('export-section');
+      const btnCopyResults = document.getElementById('btn-copy-results');
+      const btnExportCsv = document.getElementById('btn-export-csv');
+      const toastMessage = document.getElementById('toast-message');
+      const drawNameInput = document.getElementById('draw-name');
+      const currentDrawName = document.getElementById('current-draw-name');
+
+      // אלמנטי אודיו
+      const drumrollSoundSelect = document.getElementById('drumroll-sound');
+      const tadaSoundSelect = document.getElementById('tada-sound');
+      const tickSoundSelect = document.getElementById('tick-sound');
+      const customDrumrollContainer = document.getElementById('custom-drumroll-container');
+      const customTadaContainer = document.getElementById('custom-tada-container');
+      const customTickContainer = document.getElementById('custom-tick-container');
+      const customDrumrollFile = document.getElementById('custom-drumroll-file');
+      const customTadaFile = document.getElementById('custom-tada-file');
+      const customTickFile = document.getElementById('custom-tick-file');
+      const drumrollStatus = document.getElementById('drumroll-status');
+      const tadaStatus = document.getElementById('tada-status');
+      const tickStatus = document.getElementById('tick-status');
+      const drumrollPreview = document.getElementById('drumroll-preview');
+      const tadaPreview = document.getElementById('tada-preview');
+      const tickPreview = document.getElementById('tick-preview');
+
+      // אודיו קונטקסט
+      let audioContext;
+
+      // צלילים
+      let drumrollSound;
+      let tadaSound;
+      let tickSound;
+
+      // מצב הצלילים
+      let customAudioSettings = {
+        drumroll: {
+          type: 'default',
+          buffer: null,
+          url: null
+        },
+        tada: {
+          type: 'default',
+          buffer: null,
+          url: null
+        },
+        tick: {
+          type: 'default',
+          buffer: null,
+          url: null
+        }
+      };
+
+      // מצב המערכת
+      let allItems = []; // כל הפריטים
+      let uniqueItems = []; // פריטים ייחודיים בלבד
+      let availableItems = []; // פריטים זמינים להגרלה
+      let winningItems = []; // פריטים שזכו עם מזהה ייחודי
+      let currentDrawPrize = ''; // שם לסיבוב ההגרלה הנוכחי
+      let drawRounds = []; // רשימת כל סיבובי ההגרלה (מכיל שם לכל סיבוב)
+      let isDrawing = false; // האם נמצאים בתהליך הגרלה
+      let isSoundOn = true; // האם צלילים מופעלים
+      let isAnimationsOn = true; // האם אנימציות מופעלות
+
+      // עדכון לפי מצב ההגדרות
+      isSoundOn = soundToggle.checked;
+      isAnimationsOn = animationToggle.checked;
+
+      // האזנה לאירועים
+      btnSettings.addEventListener('click', toggleSettings);
+      btnCloseSettings.addEventListener('click', toggleSettings);
+      btnStageSettings.addEventListener('click', toggleSettings);
+      btnAddItems.addEventListener('click', addItems);
+      fileUpload.addEventListener('change', handleFileUpload);
+      btnDraw.addEventListener('click', startDraw);
+      btnReset.addEventListener('click', resetWinners);
+      btnNewDraw.addEventListener('click', newDraw);
+      btnCloseStage.addEventListener('click', closeLotteryStage);
+      btnCopyResults.addEventListener('click', copyResultsToClipboard);
+      btnExportCsv.addEventListener('click', exportResultsToCsv);
+      drawNameInput.addEventListener('input', updateDrawName);
+      soundToggle.addEventListener('change', () => {
+        isSoundOn = soundToggle.checked;
+        initAudio();
+      });
+      animationToggle.addEventListener('change', () => {
+        isAnimationsOn = animationToggle.checked;
+      });
+
+      // אירועים להגדרות אודיו
+      drumrollSoundSelect.addEventListener('change', () => toggleCustomAudio('drumroll'));
+      tadaSoundSelect.addEventListener('change', () => toggleCustomAudio('tada'));
+      tickSoundSelect.addEventListener('change', () => toggleCustomAudio('tick'));
+
+      customDrumrollFile.addEventListener('change', (e) => handleCustomAudioUpload(e, 'drumroll'));
+      customTadaFile.addEventListener('change', (e) => handleCustomAudioUpload(e, 'tada'));
+      customTickFile.addEventListener('change', (e) => handleCustomAudioUpload(e, 'tick'));
+
+      // טעינת הגדרות מקומיות
+      loadLocalSettings();
+
+      // פונקציה להפעלת אודיו
+      function initAudio() {
+        if (isSoundOn && !audioContext) {
+          try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // טעינת צלילים
+            loadSounds();
+          } catch (e) {
+            console.error('לא ניתן להפעיל אודיו:', e);
+          }
+        }
+      }
+
+      // יצירת כוכבים
+      function createStars() {
+        const starsContainer = document.getElementById('stars-container');
+        const starsCount = 100;
+
+        for (let i = 0; i < starsCount; i++) {
+          const star = document.createElement('div');
+          star.className = 'star';
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.width = `${Math.random() * 3 + 1}px`;
+          star.style.height = star.style.width;
+          star.style.animationDelay = `${Math.random() * 2}s`;
+
+          starsContainer.appendChild(star);
+        }
+      }
+
+      // עדכון שם ההגרלה הנוכחית
+      function updateDrawName() {
+        currentDrawPrize = drawNameInput.value.trim();
+
+        if (currentDrawPrize) {
+          currentDrawName.textContent = `הגרלת ${currentDrawPrize}`;
+          currentDrawName.style.display = 'block';
+        } else {
+          currentDrawName.textContent = '';
+          currentDrawName.style.display = 'none';
+        }
+      }
+
+      // טעינת הגדרות מקומיות
+      function loadLocalSettings() {
+        try {
+          // טעינת הגדרות אודיו
+          const savedAudioSettings = localStorage.getItem('customAudioSettings');
+          if (savedAudioSettings) {
+            const parsedSettings = JSON.parse(savedAudioSettings);
+
+            // עדכון סוג הצליל
+            if (parsedSettings.drumroll && parsedSettings.drumroll.type) {
+              drumrollSoundSelect.value = parsedSettings.drumroll.type;
+              toggleCustomAudio('drumroll');
+
+              if (parsedSettings.drumroll.url) {
+                drumrollStatus.textContent = "צליל מותאם אישית נטען";
+                drumrollPreview.src = parsedSettings.drumroll.url;
+                drumrollPreview.style.display = 'block';
+              }
+            }
+
+            if (parsedSettings.tada && parsedSettings.tada.type) {
+              tadaSoundSelect.value = parsedSettings.tada.type;
+              toggleCustomAudio('tada');
+
+              if (parsedSettings.tada.url) {
+                tadaStatus.textContent = "צליל מותאם אישית נטען";
+                tadaPreview.src = parsedSettings.tada.url;
+                tadaPreview.style.display = 'block';
+              }
+            }
+
+            if (parsedSettings.tick && parsedSettings.tick.type) {
+              tickSoundSelect.value = parsedSettings.tick.type;
+              toggleCustomAudio('tick');
+
+              if (parsedSettings.tick.url) {
+                tickStatus.textContent = "צליל מותאם אישית נטען";
+                tickPreview.src = parsedSettings.tick.url;
+                tickPreview.style.display = 'block';
+              }
+            }
+
+            // עדכון מצב הצלילים
+            customAudioSettings = parsedSettings;
+          }
+        } catch (error) {
+          console.error('שגיאה בטעינת הגדרות מקומיות:', error);
+        }
+      }
+
+      // שמירת הגדרות מקומיות
+      function saveLocalSettings() {
+        try {
+          localStorage.setItem('customAudioSettings', JSON.stringify(customAudioSettings));
+        } catch (error) {
+          console.error('שגיאה בשמירת הגדרות מקומיות:', error);
+        }
+      }
+
+      // הוחלפה בחירת סוג הצליל
+      function toggleCustomAudio(soundType) {
+        const select = document.getElementById(`${soundType}-sound`);
+        const container = document.getElementById(`custom-${soundType}-container`);
+
+        if (select.value === 'custom') {
+          container.style.display = 'block';
+          customAudioSettings[soundType].type = 'custom';
+        } else {
+          container.style.display = 'none';
+          customAudioSettings[soundType].type = 'default';
+        }
+
+        saveLocalSettings();
+
+        // טעינת הצלילים מחדש אם יש צורך
+        if (audioContext) {
+          loadSounds();
+        }
+      }
+
+      // טיפול בהעלאת קובץ אודיו מותאם אישית
+      function handleCustomAudioUpload(event, soundType) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const statusElement = document.getElementById(`${soundType}-status`);
+        const previewElement = document.getElementById(`${soundType}-preview`);
+
+        statusElement.textContent = "מעלה...";
+
+        try {
+          // יצירת URL לקובץ
+          const audioUrl = URL.createObjectURL(file);
+
+          // עדכון תצוגת קדם
+          previewElement.src = audioUrl;
+          previewElement.style.display = 'block';
+
+          // עדכון מצב הצליל
+          customAudioSettings[soundType].url = audioUrl;
+          customAudioSettings[soundType].filename = file.name;
+
+          // ניסיון לטעון את הקובץ לאודיו קונטקסט
+          if (audioContext) {
+            file.arrayBuffer().then(arrayBuffer => {
+              return audioContext.decodeAudioData(arrayBuffer);
+            }).then(audioBuffer => {
+              customAudioSettings[soundType].buffer = audioBuffer;
+              statusElement.textContent = `הקובץ ${file.name} נטען בהצלחה`;
+              saveLocalSettings();
+            }).catch(error => {
+              statusElement.textContent = `שגיאה בטעינת הקובץ: ${error.message}`;
+              console.error('שגיאה בטעינת קובץ אודיו:', error);
+            });
+          } else {
+            statusElement.textContent = `הקובץ ${file.name} מוכן`;
+            saveLocalSettings();
+          }
+        } catch (error) {
+          statusElement.textContent = `שגיאה: ${error.message}`;
+          console.error('שגיאה בטיפול בקובץ אודיו:', error);
+        }
+      }
+
+      // טעינת צלילים
+          async function loadSounds() {
+            if (!audioContext) return;
+
+            try {
+              // נתיבים לקבצי אודיו מברירת מחדל
+              const defaultSoundPaths = {
+                drumroll: 'audio/drumroll.mp3',
+                tada: 'audio/tada.mp3',
+                tick: 'audio/tick.mp3'
+              };
+
+              // טעינת צלילי ברירת מחדל או צלילים מותאמים אישית
+              // צליל תופים
+              if (customAudioSettings.drumroll.type === 'custom' && customAudioSettings.drumroll.buffer) {
+                // אם כבר יש באפר מוכן
+                drumrollSound = customAudioSettings.drumroll.buffer;
+              } else if (customAudioSettings.drumroll.type === 'custom' && customAudioSettings.drumroll.url) {
+                // אם יש URL לצליל מותאם אישית
+                try {
+                  const response = await fetch(customAudioSettings.drumroll.url);
+                  const arrayBuffer = await response.arrayBuffer();
+                  drumrollSound = await audioContext.decodeAudioData(arrayBuffer);
+                  customAudioSettings.drumroll.buffer = drumrollSound;
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל תופים מותאם אישית:', error);
+                  drumrollSound = createDummySound(0.2, 'sawtooth');
+                }
+              } else {
+                // טעינת צליל ברירת מחדל
+                try {
+                  const response = await fetch(defaultSoundPaths.drumroll);
+                  const arrayBuffer = await response.arrayBuffer();
+                  drumrollSound = await audioContext.decodeAudioData(arrayBuffer);
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל תופים ברירת מחדל:', error);
+                  drumrollSound = createDummySound(0.2, 'sawtooth');
+                }
+              }
+
+              // צליל זכייה
+              if (customAudioSettings.tada.type === 'custom' && customAudioSettings.tada.buffer) {
+                tadaSound = customAudioSettings.tada.buffer;
+              } else if (customAudioSettings.tada.type === 'custom' && customAudioSettings.tada.url) {
+                try {
+                  const response = await fetch(customAudioSettings.tada.url);
+                  const arrayBuffer = await response.arrayBuffer();
+                  tadaSound = await audioContext.decodeAudioData(arrayBuffer);
+                  customAudioSettings.tada.buffer = tadaSound;
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל זכייה מותאם אישית:', error);
+                  tadaSound = createDummySound(0.8, 'triangle');
+                }
+              } else {
+                try {
+                  const response = await fetch(defaultSoundPaths.tada);
+                  const arrayBuffer = await response.arrayBuffer();
+                  tadaSound = await audioContext.decodeAudioData(arrayBuffer);
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל זכייה ברירת מחדל:', error);
+                  tadaSound = createDummySound(0.8, 'triangle');
+                }
+              }
+
+              // צליל טיק
+              if (customAudioSettings.tick.type === 'custom' && customAudioSettings.tick.buffer) {
+                tickSound = customAudioSettings.tick.buffer;
+              } else if (customAudioSettings.tick.type === 'custom' && customAudioSettings.tick.url) {
+                try {
+                  const response = await fetch(customAudioSettings.tick.url);
+                  const arrayBuffer = await response.arrayBuffer();
+                  tickSound = await audioContext.decodeAudioData(arrayBuffer);
+                  customAudioSettings.tick.buffer = tickSound;
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל טיק מותאם אישית:', error);
+                  tickSound = createDummySound(0.5, 'sine');
+                }
+              } else {
+                try {
+                  const response = await fetch(defaultSoundPaths.tick);
+                  const arrayBuffer = await response.arrayBuffer();
+                  tickSound = await audioContext.decodeAudioData(arrayBuffer);
+                } catch (error) {
+                  console.error('שגיאה בטעינת צליל טיק ברירת מחדל:', error);
+                  tickSound = createDummySound(0.5, 'sine');
+                }
+              }
+            } catch (error) {
+              console.error('שגיאה כללית בטעינת צלילים:', error);
+
+              // יצירת צלילים מדומים במקרה של שגיאה
+              drumrollSound = createDummySound(0.2, 'sawtooth');
+              tadaSound = createDummySound(0.8, 'triangle');
+              tickSound = createDummySound(0.5, 'sine');
+            }
+          }
+
+          // יצירת צליל לדוגמה (ללא טעינת קובץ בפועל)
+          function createDummySound(freq, type) {
+            return {
+              type: type,
+              frequency: freq
+            };
+          }
+
+          // ניגון צליל
+          function playSound(sound, options = {}) {
+            if (!isSoundOn || !audioContext) return null;
+
+            try {
+              // אם האודיו קונטקסט מושהה, הפעל אותו
+              if (audioContext.state === 'suspended') {
+                audioContext.resume();
+              }
+
+              // בדיקה אם מדובר באודיו באפר אמיתי או צליל מדומה
+              if (sound.type && sound.frequency) {
+                // צליל מדומה
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.type = sound.type || 'sine';
+                oscillator.frequency.value = sound.frequency * 300 + 200;
+
+                gainNode.gain.value = options.volume || 0.3;
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.start();
+
+                if (!options.loop) {
+                  setTimeout(() => {
+                    oscillator.stop();
+                  }, options.duration || 300);
+                }
+
+                return oscillator;
+              } else {
+                // זהו אודיו באפר אמיתי
+                const source = audioContext.createBufferSource();
+                source.buffer = sound;
+
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = options.volume || 0.5;
+
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                if (options.loop) {
+                  source.loop = true;
+                }
+
+                source.start();
+
+                if (!options.loop && options.duration) {
+                  setTimeout(() => {
+                    source.stop();
+                  }, options.duration);
+                }
+
+                return source;
+              }
+            } catch (error) {
+              console.error('שגיאה בניגון צליל:', error);
+              return null;
+            }
+          }
+
+          // עצירת צליל
+          function stopSound(source) {
+            if (!source) return;
+
+            try {
+              source.stop();
+            } catch (error) {
+              console.error('שגיאה בעצירת צליל:', error);
+            }
+          }
+
+          // פתיחה/סגירה של פאנל ההגדרות
+          function toggleSettings() {
+            settingsPanel.classList.toggle('open');
+
+            // אתחול אודיו בלחיצה על כפתור ההגדרות
+            if (settingsPanel.classList.contains('open')) {
+              initAudio();
+            }
+          }
+
+          // הוספת פריטים
+          function addItems() {
+            const newItemsText = itemsInput.value.trim();
+            if (!newItemsText) {
+              showError('נא להזין פריטים לפני ההוספה');
+              return;
+            }
+
+            const newItems = newItemsText.split('\n')
+              .map(item => item.trim())
+              .filter(item => item);
+
+            if (newItems.length === 0) {
+              showError('לא נמצאו פריטים תקינים');
+              return;
+            }
+
+            const allowDuplicates = allowDuplicatesSelect.value === 'true';
+
+            // רשימת פריטים חדשים מסומנים עם מזהה ייחודי
+            let nextId = allItems.length;
+            const newItemsWithIds = newItems.map(item => {
+              return {
+                name: item,
+                id: nextId++
+              };
+            });
+
+            // הוספת הפריטים לרשימת הפריטים
+            if (allowDuplicates) {
+              // במקרה שמאפשרים כפילויות
+              allItems = [...allItems, ...newItemsWithIds];
+              availableItems = [...availableItems, ...newItemsWithIds];
+
+              // עדכון רשימת הפריטים הייחודיים
+              newItems.forEach(item => {
+                if (!uniqueItems.includes(item)) {
+                  uniqueItems.push(item);
+                }
+              });
+            } else {
+              // מניעת כפילויות - רק שמות ייחודיים
+              for (const newItem of newItemsWithIds) {
+                if (!uniqueItems.includes(newItem.name)) {
+                  allItems.push(newItem);
+                  availableItems.push(newItem);
+                  uniqueItems.push(newItem.name);
+                }
+              }
+            }
+
+            // עדכון תצוגת הפריטים
+            renderItems();
+            updateStats();
+            updateDrawButton();
+            itemsInput.value = '';
+            errorMessage.textContent = '';
+
+            // אם זאת הפעם הראשונה שמוסיפים פריטים, הסתר את הודעת ה"אין פריטים"
+            if (allItems.length > 0) {
+              noItemsMessage.style.display = 'none';
+            }
+
+            // השמעת צליל אישור
+            playSound(tickSound, { volume: 0.3 });
+          }
+
+          // טיפול בהעלאת קובץ
+          function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileName.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const content = e.target.result;
+              itemsInput.value = content;
+            };
+            reader.readAsText(file);
+          }
+
+          // הצגת פריטים במסך
+          function renderItems() {
+            hexagonContainer.innerHTML = '';
+
+            // יצירת אלמנטים עבור כל הפריטים
+            allItems.forEach(item => {
+              const hexagon = document.createElement('div');
+              hexagon.className = 'hexagon';
+              hexagon.dataset.id = item.id;
+              hexagon.dataset.name = item.name;
+
+              // בדיקה אם הפריט זכה כבר
+              const isWinner = winningItems.some(winItem => winItem.id === item.id);
+              if (isWinner) {
+                hexagon.classList.add('winner');
+              }
+
+              // יצירת תוכן הפריט
+              const hexIndex = document.createElement('div');
+              hexIndex.className = 'hexagon-index';
+              hexIndex.textContent = item.id + 1; // מספור החל מ-1
+
+              const hexContent = document.createElement('div');
+              hexContent.className = 'hexagon-content';
+              hexContent.textContent = item.name;
+
+              hexagon.appendChild(hexIndex);
+              hexagon.appendChild(hexContent);
+
+              hexagonContainer.appendChild(hexagon);
+            });
+          }
+
+          // עדכון סטטיסטיקות
+          function updateStats() {
+            totalItemsEl.textContent = allItems.length;
+            availableItemsEl.textContent = availableItems.length;
+            totalWinnersEl.textContent = winningItems.length;
+
+            // הצג/הסתר אזור הייצוא בהתאם למספר הזוכים
+            if (winningItems.length > 0) {
+              exportSection.style.display = 'block';
+            } else {
+              exportSection.style.display = 'none';
+            }
+          }
+
+          // עדכון כפתור ההגרלה
+          function updateDrawButton() {
+            // חשוב! - כאן מוודאים שהכפתור פעיל אם יש פריטים זמינים
+            btnDraw.disabled = (availableItems.length === 0 || isDrawing);
+
+            if (availableItems.length === 0) {
+              btnDraw.innerHTML = '<span class="btn-icon">🎲</span><span class="btn-text">אין פריטים זמינים</span>';
+            } else {
+              btnDraw.innerHTML = '<span class="btn-icon">🎲</span><span class="btn-text">הגרל עכשיו!</span>';
+            }
+          }
+
+          // הצגת הודעת שגיאה
+          function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.opacity = '0';
+
+            // אנימציית הופעה
+            setTimeout(() => {
+              errorMessage.style.transition = 'opacity 0.3s';
+              errorMessage.style.opacity = '1';
+            }, 10);
+          }
+
+          // הצגת הודעת טוסט
+          function showToast(message, duration = 3000) {
+            toastMessage.textContent = message;
+            toastMessage.classList.add('show');
+
+            setTimeout(() => {
+              toastMessage.classList.remove('show');
+            }, duration);
+          }
+
+          // התחלת הגרלה - הפונקציה החדשה עם אפקט החלפת מדגמים
+          function startDraw() {
+            let winnersCount = parseInt(winnersCountInput.value);
+            if (winnersCount <= 0) {
+              showError('מספר הזוכים חייב להיות חיובי');
+              return;
+            }
+
+            // מספר הזוכים לא יכול להיות גדול ממספר הפריטים הזמינים
+            if (winnersCount > availableItems.length) {
+              winnersCount = availableItems.length;
+              showError(`מספר הזוכים הותאם ל-${winnersCount} (מספר הפריטים הזמינים)`);
+            }
+
+            isDrawing = true;
+            updateDrawButton();
+
+            // שמירת שם סיבוב ההגרלה הנוכחי
+            const drawRoundPrize = currentDrawPrize || '';
+
+            // אתחול מסך ההגרלה
+            stageCardsContainer.innerHTML = '';
+            stageProgressBar.style.width = '0%';
+            btnCloseStage.style.display = 'none';
+
+            // הצגת מסך ההגרלה
+            lotteryStage.classList.add('active');
+
+            // בחירת הזוכים מראש (אך לא מציגים אותם עדיין)
+            const newWinningItems = [];
+            const tempAvailableItems = [...availableItems];
+
+            for (let i = 0; i < winnersCount; i++) {
+              if (tempAvailableItems.length === 0) break;
+
+              const randomIndex = Math.floor(Math.random() * tempAvailableItems.length);
+              const winner = tempAvailableItems[randomIndex];
+
+              // הוספת שם הפרס לזוכה
+              const winnerWithPrize = {
+                ...winner,
+                prize: drawRoundPrize,
+                drawRound: drawRounds.length // מספר סיבוב
+              };
+
+              newWinningItems.push(winnerWithPrize);
+              tempAvailableItems.splice(randomIndex, 1);
+            }
+
+            // שמירת סיבוב ההגרלה
+            drawRounds.push({
+              name: drawRoundPrize,
+              winners: newWinningItems.map(w => w.id)
+            });
+
+            // הגדרות אנימציה
+            const totalPhases = isAnimationsOn ? 30 : 15; // סך כל שלבי האנימציה
+            const initialSampleSize = Math.min(60, Math.max(20, availableItems.length / 2)); // כמה פריטים להציג בכל פעם
+            let currentPhase = 0;
+
+            // הפעלת צליל תופים
+            const drumrollInstance = playSound(drumrollSound, { loop: true, volume: 0.5, duration: 5000 });
+
+            // פונקציה להצגת מדגם אקראי של פריטים
+            function showRandomSample() {
+              stageCardsContainer.innerHTML = ''; // ניקוי התצוגה הקודמת
+
+              // חישוב גודל המדגם לשלב הנוכחי
+              // ככל שמתקדמים בשלבים, המדגם מתכנס יותר לקבוצת הזוכים
+              const progress = currentPhase / totalPhases;
+              let sampleSize = Math.max(
+                winnersCount,
+                Math.floor(initialSampleSize - progress * (initialSampleSize - winnersCount))
+              );
+
+              // בחירת המדגם - שילוב של פריטים אקראיים + הזוכים העתידיים
+              let sample = [];
+
+              // הוספת חלק מהזוכים בהדרגה
+              const winnersToInclude = Math.ceil(newWinningItems.length * Math.min(1, progress * 1.5));
+              for (let i = 0; i < winnersToInclude; i++) {
+                sample.push(newWinningItems[i]);
+              }
+
+              // הוספת פריטים אקראיים להשלמת המדגם
+              const otherItems = availableItems.filter(item =>
+                !sample.some(sampleItem => sampleItem.id === item.id)
+              );
+
+              // ערבוב הפריטים האחרים
+              const shuffledOtherItems = [...otherItems].sort(() => Math.random() - 0.5);
+
+              // הוספת פריטים אקראיים עד למילוי המדגם
+              while (sample.length < sampleSize && shuffledOtherItems.length > 0) {
+                sample.push(shuffledOtherItems.pop());
+              }
+
+              // ערבוב המדגם
+              sample = sample.sort(() => Math.random() - 0.5);
+
+              // הצגת המדגם
+              sample.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'stage-card';
+                card.dataset.id = item.id;
+                card.dataset.name = item.name;
+
+                // הדגשת הזוכים בשלבים האחרונים
+                if (progress > 0.8 && newWinningItems.some(w => w.id === item.id)) {
+                  card.classList.add('highlight');
+                }
+
+                // הוספת מספר מזהה ושם
+                const cardIndex = document.createElement('div');
+                cardIndex.className = 'stage-card-index';
+                cardIndex.textContent = item.id + 1;
+
+                const cardName = document.createElement('div');
+                cardName.className = 'stage-card-name';
+                cardName.textContent = item.name;
+
+                card.appendChild(cardIndex);
+                card.appendChild(cardName);
+
+                stageCardsContainer.appendChild(card);
+              });
+
+              // עדכון פס ההתקדמות
+              currentPhase++;
+              stageProgressBar.style.width = `${(currentPhase / totalPhases) * 100}%`;
+
+              // השמעת צליל טיק
+              if (currentPhase % 3 === 0) {
+                playSound(tickSound, { volume: 0.1, duration: 100 });
+              }
+
+              // סיום האנימציה או המשך
+              if (currentPhase >= totalPhases) {
+                clearInterval(sampleInterval);
+                finishDraw(newWinningItems, drumrollInstance);
+              }
+            }
+
+            // התחלת אנימציית החלפת המדגמים
+            const interval = isAnimationsOn ? 200 : 100;
+            const sampleInterval = setInterval(showRandomSample, interval);
+          }
+
+          // סיום ההגרלה
+          function finishDraw(newWinningItems, drumrollInstance) {
+            // עצירת צליל התופים
+            stopSound(drumrollInstance);
+
+            // ניקוי המסך והצגת הזוכים בלבד
+            stageCardsContainer.innerHTML = '';
+
+            newWinningItems.forEach(winner => {
+              const card = document.createElement('div');
+              card.className = 'stage-card selected';
+              card.dataset.id = winner.id;
+              card.dataset.name = winner.name;
+
+              const cardIndex = document.createElement('div');
+              cardIndex.className = 'stage-card-index';
+              cardIndex.textContent = winner.id + 1;
+
+              const cardName = document.createElement('div');
+              cardName.className = 'stage-card-name';
+              cardName.textContent = winner.name;
+
+              card.appendChild(cardIndex);
+              card.appendChild(cardName);
+
+              stageCardsContainer.appendChild(card);
+            });
+
+            // הסרת הזוכים מרשימת הפריטים הזמינים
+            newWinningItems.forEach(winItem => {
+              const index = availableItems.findIndex(item => item.id === winItem.id);
+              if (index !== -1) {
+                availableItems.splice(index, 1);
+              }
+            });
+
+            // הוספת הזוכים לרשימת הזוכים
+            winningItems = [...winningItems, ...newWinningItems];
+
+            // השמעת צליל זכייה
+            playSound(tadaSound, { volume: 0.7, duration: 1500 });
+
+            // עדכון כותרת
+            document.querySelector('.stage-title').textContent = 'הזוכים בהגרלה!';
+
+            // הצגת כפתור חזרה
+            setTimeout(() => {
+              btnCloseStage.style.display = 'block';
+
+              // עדכון הממשק הראשי
+              renderItems();
+              updateWinnersList(newWinningItems);
+              updateStats();
+
+              isDrawing = false;
+              updateDrawButton();
+
+              // יצירת אפקט קונפטי עבור כל זוכה
+              if (isAnimationsOn) {
+                const winnerCards = stageCardsContainer.querySelectorAll('.stage-card.selected');
+                winnerCards.forEach(card => {
+                  createConfetti(card);
+                });
+              }
+            }, 1500);
+          }
+
+          // עדכון רשימת הזוכים - עם תמיכה בשם הפרס
+          function updateWinnersList(newWinningItems) {
+            newWinningItems.forEach(winner => {
+              // חישוב המיקום של הזוכה הנוכחי (לא לפי שם אלא לפי מיקום ברשימת הזוכים)
+              const winnerIndex = winningItems.findIndex(item => item.id === winner.id) + 1;
+
+              const winnerItem = document.createElement('div');
+              winnerItem.className = 'winner-item';
+              winnerItem.dataset.id = winner.id;
+
+              const winnerIndexEl = document.createElement('span');
+              winnerIndexEl.className = 'winner-index';
+              winnerIndexEl.textContent = winnerIndex;
+
+              const winnerDetails = document.createElement('div');
+              winnerDetails.className = 'winner-details';
+
+              const winnerName = document.createElement('div');
+              winnerName.className = 'winner-name';
+              winnerName.textContent = winner.name;
+
+              winnerDetails.appendChild(winnerName);
+
+              // הוספת שם הפרס אם קיים
+              if (winner.prize) {
+                const winnerPrize = document.createElement('div');
+                winnerPrize.className = 'winner-prize';
+                winnerPrize.textContent = `זכה ב: ${winner.prize}`;
+                winnerDetails.appendChild(winnerPrize);
+              }
+
+              winnerItem.appendChild(winnerIndexEl);
+              winnerItem.appendChild(winnerDetails);
+
+              // אנימציית הופעה
+              winnerItem.style.opacity = '0';
+              winnerItem.style.transform = 'translateY(20px)';
+
+              winnersList.appendChild(winnerItem);
+
+              // הפעלת אנימציה
+              setTimeout(() => {
+                winnerItem.style.transition = 'all 0.5s ease-out';
+                winnerItem.style.opacity = '1';
+                winnerItem.style.transform = 'translateY(0)';
+              }, 100);
+
+              // יצירת קונפטי על הזוכה במסך הראשי
+              if (isAnimationsOn) {
+                setTimeout(() => {
+                  const hexagons = document.querySelectorAll(`.hexagon[data-id="${winner.id}"]`);
+                  hexagons.forEach(hexagon => {
+                    createConfetti(hexagon);
+                  });
+                }, 500);
+              }
+            });
+          }
+
+          // העתקת תוצאות ללוח
+          function copyResultsToClipboard() {
+            if (winningItems.length === 0) return;
+
+            let textToCopy = "תוצאות ההגרלה:\n\n";
+
+            // קיבוץ הזוכים לפי סיבובים
+            const roundsMap = {};
+
+            // מיון הזוכים לפי סיבובים
+            winningItems.forEach((winner, index) => {
+              const roundName = winner.prize || 'ללא שם';
+
+              if (!roundsMap[roundName]) {
+                roundsMap[roundName] = [];
+              }
+
+              roundsMap[roundName].push({
+                index: index + 1,
+                name: winner.name
+              });
+            });
+
+            // הוספת הזוכים מסודרים לפי סיבובים
+            for (const roundName in roundsMap) {
+              textToCopy += `== ${roundName} ==\n`;
+
+              roundsMap[roundName].forEach(winner => {
+                textToCopy += `${winner.index}. ${winner.name}\n`;
+              });
+
+              textToCopy += '\n';
+            }
+
+            // העתקה ללוח
+            navigator.clipboard.writeText(textToCopy)
+              .then(() => {
+                showToast("התוצאות הועתקו בהצלחה ללוח!");
+                playSound(tickSound, { volume: 0.5 });
+              })
+              .catch(err => {
+                console.error('שגיאה בהעתקה ללוח:', err);
+                showToast("אירעה שגיאה בהעתקה ללוח");
+              });
+          }
+
+          // ייצוא תוצאות לקובץ CSV
+          function exportResultsToCsv() {
+            if (winningItems.length === 0) return;
+
+            // יצירת תוכן ה-CSV עם BOM לתמיכה בעברית
+            let csvContent = "\uFEFF" + "מספר,שם זוכה,פרס\n";
+
+            // הוספת כל הזוכים
+            winningItems.forEach((winner, index) => {
+              const prize = winner.prize || '';
+              csvContent += `${index + 1},"${winner.name}","${prize}"\n`;
+            });
+
+            // יצירת הקובץ
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            // יצירת קישור להורדה
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "תוצאות_הגרלה.csv");
+            document.body.appendChild(link);
+
+            // הורדת הקובץ והסרת הקישור
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("הקובץ הורד בהצלחה!");
+            playSound(tickSound, { volume: 0.5 });
+          }
+
+          // יצירת אפקט קונפטי
+          function createConfetti(element) {
+            if (!isAnimationsOn) return;
+
+            const rect = element.getBoundingClientRect();
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+
+            for (let i = 0; i < 30; i++) {
+              const confetti = document.createElement('div');
+              confetti.className = 'confetti';
+
+              // צבעים שונים לקונפטי
+              const colors = ['#FF5722', '#FFC107', '#4FC3F7', '#E040FB', '#76FF03', '#FFEB3B'];
+              const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+              // צורות שונות
+            const shapes = ['50%', '0%'];
+            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+
+            // גדלים שונים
+            const size = Math.random() * 10 + 5;
+
+            confetti.style.backgroundColor = randomColor;
+            confetti.style.borderRadius = randomShape;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+            confetti.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
+            confetti.style.top = `${rect.top - containerRect.top + rect.height / 2}px`;
+
+            container.appendChild(confetti);
+
+            // אנימציית נפילה
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;
+            const duration = 1000 + Math.random() * 1000;
+
+            const destX = distance * Math.cos(angle);
+            const destY = distance * Math.sin(angle);
+
+            confetti.animate([
+              { transform: 'translate(0, 0) rotate(0deg) scale(0)', opacity: 1 },
+              { transform: `translate(${destX}px, ${destY}px) rotate(${Math.random() * 720 - 360}deg) scale(1)`, opacity: 1, offset: 0.7 },
+              { transform: `translate(${destX}px, ${destY * 1.5}px) rotate(${Math.random() * 720 - 360}deg) scale(0.5)`, opacity: 0 }
+            ], {
+              duration: duration,
+              easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+              fill: 'forwards'
+            });
+
+            // מחיקת הקונפטי אחרי סיום האנימציה
+            setTimeout(() => {
+              confetti.remove();
+            }, duration + 100);
+          }
+        }
+
+        // איפוס זוכים
+        function resetWinners() {
+          // החזרת הזוכים לפריטים הזמינים
+          availableItems = [...allItems];
+          winningItems = [];
+          drawRounds = [];
+
+          // ניקוי סימוני זוכים
+          const hexagons = document.querySelectorAll('.hexagon');
+          hexagons.forEach(hex => hex.classList.remove('winner'));
+
+          // ניקוי רשימת הזוכים
+          winnersList.innerHTML = '';
+
+          // עדכון הממשק
+          updateStats();
+          updateDrawButton();
+
+          // השמעת צליל איפוס
+          playSound(tickSound, { volume: 0.5 });
+        }
+
+        // הגרלה חדשה
+        function newDraw() {
+          // איפוס כל המערכת
+          resetWinners();
+          allItems = [];
+          availableItems = [];
+          uniqueItems = [];
+          currentDrawPrize = '';
+          drawNameInput.value = '';
+          currentDrawName.textContent = '';
+          currentDrawName.style.display = 'none';
+          hexagonContainer.innerHTML = '';
+          noItemsMessage.style.display = 'block';
+
+          // עדכון הממשק
+          updateStats();
+          updateDrawButton();
+
+          // השמעת צליל איפוס
+          playSound(tickSound, { volume: 0.5 });
+        }
+
+        // סגירת מסך ההגרלה
+        function closeLotteryStage() {
+          lotteryStage.classList.remove('active');
+        }
+
+        // אתחול הדף
+        updateStats();
+        updateDrawButton();
+
+        // יצירת נתוני דוגמה - אפשר לבטל בגרסה הסופית
+        function createSampleData() {
+          itemsInput.value =
+            "משתתף 1\n" +
+            "משתתף 2\n" +
+            "משתתף 3\n" +
+            "משתתף 4\n" +
+            "משתתף 5\n" +
+            "משתתף 6\n" +
+            "משתתף 7\n" +
+            "משתתף 8\n" +
+            "משתתף 9\n" +
+            "משתתף 10\n" +
+            "משתתף 1";  // כפילות לדוגמה
+
+          drawNameInput.value = "פרס ראשון";
+          updateDrawName();
+        }
+
+        // לחיצה כפולה על אזור הטקסט להזנת דוגמאות
+        itemsInput.addEventListener('dblclick', function() {
+          if (itemsInput.value.trim() === '') {
+            createSampleData();
+          }
+        });
+      });
+    </script>
+  </body>
+  </html>
